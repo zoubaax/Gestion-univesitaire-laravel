@@ -54,15 +54,31 @@ class EtudiantController extends Controller
         $validatedData = $request->validate([
             'nom' => 'required|string|max:255',
             'prenom' => 'required|string|max:255',
-            'email' => 'required|email|unique:etudiants,email',
+            'email' => 'required|email|unique:users,email|unique:etudiants,email',
             'filiere_id' => 'required|exists:filieres,id',
-            'moyenne' => 'nullable|numeric|min:0|max:20',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        Etudiant::create($validatedData);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validatedData) {
+            $user = \App\Models\User::create([
+                'name' => $validatedData['prenom'] . ' ' . $validatedData['nom'],
+                'email' => $validatedData['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($validatedData['password']),
+                'role' => 'student',
+            ]);
+
+            Etudiant::create([
+                'nom' => $validatedData['nom'],
+                'prenom' => $validatedData['prenom'],
+                'email' => $validatedData['email'],
+                'filiere_id' => $validatedData['filiere_id'],
+                'user_id' => $user->id,
+                'moyenne' => 0,
+            ]);
+        });
 
         return redirect()->route('etudiants.index')
-            ->with('success', 'Étudiant ajouté avec succès !');
+            ->with('success', 'Étudiant et compte de connexion créés avec succès !');
     }
 
     /**

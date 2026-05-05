@@ -5,27 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Etudiant extends Model
+class Module extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'nom',
-        'prenom',
-        'email',
-        'filiere_id',
-        'user_id',
-        'moyenne',
-    ];
-
-    protected $casts = [
-        'moyenne' => 'decimal:2',
-    ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $fillable = ['nom', 'code', 'description', 'filiere_id'];
 
     public function filiere()
     {
@@ -42,8 +26,13 @@ class Etudiant extends Model
         return $this->hasMany(Absence::class);
     }
 
-    public function documentRequests()
+    public function courseMaterials()
     {
-        return $this->hasMany(DocumentRequest::class);
+        return $this->hasMany(CourseMaterial::class);
+    }
+
+    public function announcements()
+    {
+        return $this->hasMany(Announcement::class);
     }
 }

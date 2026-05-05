@@ -57,6 +57,7 @@
                         @endforeach
                     </div>
 
+                    @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                     <div class="mt-5 d-flex gap-2">
                         <a href="{{ route('etudiants.edit', $etudiant->id) }}" class="btn btn-warning flex-grow-1 py-3 fw-bold">
                             <i class="bi bi-pencil me-2"></i>Modifier le profil
@@ -65,15 +66,18 @@
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
+                    @endif
                 </div>
             </div>
 
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-journal-text me-2"></i>Relevé de Notes</h5>
+                    @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                     <a href="{{ route('notes.create', $etudiant->id) }}" class="btn btn-sm btn-success">
                         <i class="bi bi-plus-lg me-1"></i>Ajouter une note
                     </a>
+                    @endif
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">

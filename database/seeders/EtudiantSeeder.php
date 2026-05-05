@@ -14,43 +14,41 @@ class EtudiantSeeder extends Seeder
      */
     public function run(): void
     {
-        // Créer les filières
-        $ginfo = Filiere::create(['nom' => 'GINFO']);
-        $ddw = Filiere::create(['nom' => 'DDW']);
+        // Récupérer les filières et modules existants
+        $ginfo = Filiere::where('nom', 'LIKE', '%GINFO%')->first();
+        $phpModule = \App\Models\Module::where('code', 'PHP101')->first();
+        $dbModule = \App\Models\Module::where('code', 'DB202')->first();
 
-        // Créer des étudiants
+        // Créer des étudiants supplémentaires
         $e1 = Etudiant::create([
             'nom' => 'Benjelloun',
             'prenom' => 'Ahmed',
             'email' => 'a.benjelloun@upf.ma',
             'filiere_id' => $ginfo->id,
-            'moyenne' => 0 // Sera calculée par les notes
         ]);
 
-        $e2 = Etudiant::create([
-            'nom' => 'Mansouri',
-            'prenom' => 'Laila',
-            'email' => 'l.mansouri@upf.ma',
-            'filiere_id' => $ddw->id,
-            'moyenne' => 0
-        ]);
-
-        // Ajouter quelques notes pour tester le calcul de moyenne
+        // Ajouter des notes détaillées
         Note::create([
             'etudiant_id' => $e1->id,
-            'matiere' => 'PHP Laravel',
-            'note' => 17,
+            'module_id' => $phpModule->id,
+            'cc1' => 15,
+            'cc2' => 16,
+            'examen' => 14,
+            'note_finale' => 14.8, // (15*0.2 + 16*0.2 + 14*0.6)
             'semestre' => 'S1'
         ]);
 
         Note::create([
             'etudiant_id' => $e1->id,
-            'matiere' => 'Base de données',
-            'note' => 15,
+            'module_id' => $dbModule->id,
+            'cc1' => 12,
+            'cc2' => 14,
+            'examen' => 15,
+            'note_finale' => 14.2,
             'semestre' => 'S1'
         ]);
 
-        // Mettre à jour la moyenne initiale
-        $e1->update(['moyenne' => $e1->notes()->avg('note')]);
+        // Mettre à jour la moyenne de l'étudiant
+        $e1->update(['moyenne' => $e1->notes()->avg('note_finale')]);
     }
 }

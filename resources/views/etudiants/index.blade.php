@@ -3,22 +3,29 @@
 @section('titre', 'Liste des Étudiants')
 
 @section('contenu')
-<div class="container py-4">
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="display-5 fw-bold text-primary mb-0">Liste des Étudiants</h1>
-            <p class="text-muted mt-2">Gérez et consultez tous les étudiants inscrits</p>
+            @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
+                <h1 class="display-5 fw-bold text-primary mb-0">Liste des Étudiants</h1>
+                <p class="text-muted mt-2">Gérez et consultez tous les étudiants inscrits</p>
+            @else
+                <h1 class="display-5 fw-bold text-primary mb-0">Portail Étudiant</h1>
+                <p class="text-muted mt-2">Consultez les informations et résultats académiques</p>
+            @endif
         </div>
+        @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
         <a href="{{ route('etudiants.create') }}" class="btn btn-primary btn-lg shadow-sm">
             <i class="bi bi-plus-circle me-2"></i>Nouvel Étudiant
         </a>
+        @endif
     </div>
 
+    @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card bg-primary text-white shadow-sm">
+            <div class="card bg-primary text-white shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -31,7 +38,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-success text-white shadow-sm">
+            <div class="card bg-success text-white shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -46,7 +53,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-info text-white shadow-sm">
+            <div class="card bg-info text-white shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -59,7 +66,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card bg-warning text-white shadow-sm">
+            <div class="card bg-warning text-white shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -73,6 +80,7 @@
             </div>
         </div>
     </div>
+    @endif
 
     <!-- Search and Filter Section -->
     <div class="card shadow-sm mb-4">
@@ -81,10 +89,10 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="input-group">
-                            <span class="input-group-text bg-white">
+                            <span class="input-group-text bg-white border-end-0">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input type="text" name="search" class="form-control" id="searchInput" placeholder="Rechercher par nom, prénom..." value="{{ request('search') }}">
+                            <input type="text" name="search" class="form-control border-start-0 ps-0" id="searchInput" placeholder="Rechercher par nom, prénom..." value="{{ request('search') }}">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -109,7 +117,7 @@
     </div>
 
     <!-- Students Table -->
-    <div class="card shadow-sm">
+    <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="studentsTable">
@@ -119,7 +127,11 @@
                             <th>Nom Complet</th>
                             <th>Filière</th>
                             <th>Moyenne</th>
+                            @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                             <th class="text-end pe-4" style="width: 120px">Actions</th>
+                            @else
+                            <th class="text-end pe-4" style="width: 120px">Détails</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -167,8 +179,9 @@
                                        class="btn btn-outline-primary" 
                                        data-bs-toggle="tooltip" 
                                        title="Voir détails">
-                                        <i class="bi bi-eye"></i>
+                                        <i class="bi bi-eye"></i> {{ Auth::user()->isStudent() ? 'Voir' : '' }}
                                     </a>
+                                    @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                                     <a href="{{ route('etudiants.edit', $etudiant->id) }}" 
                                        class="btn btn-outline-warning"
                                        data-bs-toggle="tooltip" 
@@ -183,8 +196,10 @@
                                             title="Supprimer">
                                         <i class="bi bi-trash"></i>
                                     </button>
+                                    @endif
                                 </div>
                                 <!-- Delete Modal -->
+                                @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                                 <div class="modal fade" id="deleteModal{{ $etudiant->id }}" tabindex="-1">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -208,6 +223,7 @@
                                         </div>
                                     </div>
                                 </div>
+                                @endif
                             </td>
                         </tr>
                         @empty
@@ -215,9 +231,11 @@
                             <td colspan="5" class="text-center py-5">
                                 <i class="bi bi-inbox display-1 text-muted"></i>
                                 <p class="text-muted mt-3 mb-0">Aucun étudiant trouvé dans la liste.</p>
+                                @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
                                 <a href="{{ route('etudiants.create') }}" class="btn btn-primary mt-3">
                                     <i class="bi bi-plus-circle me-2"></i>Ajouter le premier étudiant
                                 </a>
+                                @endif
                             </td>
                         </tr>
                         @endforelse
@@ -233,7 +251,6 @@
         {{ $etudiants->links() }}
     </div>
     @endif
-</div>
 
 @push('scripts')
 <script>
