@@ -24,22 +24,29 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f8fafc;
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
         }
 
+        @auth
+        body {
+            padding-left: 260px;
+        }
+        @endauth
+
         /* Sidebar Styles */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 260px;
             height: 100vh;
             position: fixed;
             left: 0;
             top: 0;
             background-color: white;
             border-right: 1px solid #e2e8f0;
-            z-index: 1000;
+            z-index: 1050;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
         }
 
         .sidebar-header {
@@ -98,30 +105,33 @@
 
         /* Main Content Wrapper */
         .main-wrapper {
-            margin-left: var(--sidebar-width);
             padding: 40px;
-            transition: all 0.3s ease;
-        }
-
-        .user-profile-sm {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            min-height: 100vh;
+            background-color: #f8fafc;
+            position: relative;
+            width: 100%;
         }
 
         @media (max-width: 991.98px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.active { transform: translateX(0); }
-            .main-wrapper { margin-left: 0; padding: 20px; }
+            body {
+                padding-left: 0 !important;
+            }
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: transform 0.3s ease;
+            }
+            .sidebar.active { 
+                transform: translateX(0); 
+            }
+            .main-wrapper { 
+                padding: 20px; 
+            }
             .sidebar-overlay {
                 display: none;
                 position: fixed;
                 inset: 0;
                 background: rgba(0,0,0,0.5);
-                z-index: 999;
+                z-index: 1040;
             }
             .sidebar-overlay.active { display: block; }
         }
@@ -129,6 +139,7 @@
     @stack('styles')
 </head>
 <body>
+    @auth
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <aside class="sidebar" id="sidebar">
@@ -147,49 +158,46 @@
                 <i class="bi bi-house-door"></i> Accueil
             </a>
 
-            @auth
-                @if(Auth::user()->isAdmin())
-                <div class="nav-label mt-4">Administration</div>
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-speedometer2"></i> Dashboard
-                </a>
-                <a href="{{ route('admin.users-list') }}" class="sidebar-link {{ request()->is('admin/users-list') ? 'active' : '' }}">
-                    <i class="bi bi-people"></i> Comptes Utilisateurs
-                </a>
-                @endif
+            @if(Auth::user()->isAdmin())
+            <div class="nav-label mt-4">Administration</div>
+            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->is('admin/dashboard') ? 'active' : '' }}">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+            <a href="{{ route('admin.users-list') }}" class="sidebar-link {{ request()->is('admin/users-list') ? 'active' : '' }}">
+                <i class="bi bi-people"></i> Comptes Utilisateurs
+            </a>
+            @endif
 
-                @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
-                <div class="nav-label mt-4">Gestion Académique</div>
-                <a href="/etudiants" class="sidebar-link {{ request()->is('etudiants*') ? 'active' : '' }}">
-                    <i class="bi bi-person-workspace"></i> Étudiants
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-journal-check"></i> Modules & Notes
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-file-earmark-pdf"></i> Supports de Cours
-                </a>
-                @endif
+            @if(Auth::user()->isAdmin() || Auth::user()->isProfessor())
+            <div class="nav-label mt-4">Gestion Académique</div>
+            <a href="/etudiants" class="sidebar-link {{ request()->is('etudiants*') ? 'active' : '' }}">
+                <i class="bi bi-person-workspace"></i> Étudiants
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-journal-check"></i> Modules & Notes
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-file-earmark-pdf"></i> Supports de Cours
+            </a>
+            @endif
 
-                @if(Auth::user()->isStudent())
-                <div class="nav-label mt-4">Espace Étudiant</div>
-                <a href="/etudiants" class="sidebar-link {{ request()->is('etudiants*') ? 'active' : '' }}">
-                    <i class="bi bi-person-lines-fill"></i> Mon Profil
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-award"></i> Mes Résultats
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-calendar-event"></i> Emploi du Temps
-                </a>
-                <a href="#" class="sidebar-link">
-                    <i class="bi bi-chat-dots"></i> Classroom
-                </a>
-                @endif
-            @endauth
+            @if(Auth::user()->isStudent())
+            <div class="nav-label mt-4">Espace Étudiant</div>
+            <a href="/etudiants" class="sidebar-link {{ request()->is('etudiants*') ? 'active' : '' }}">
+                <i class="bi bi-person-lines-fill"></i> Mon Profil
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-award"></i> Mes Résultats
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-calendar-event"></i> Emploi du Temps
+            </a>
+            <a href="#" class="sidebar-link">
+                <i class="bi bi-chat-dots"></i> Classroom
+            </a>
+            @endif
         </div>
 
-        @auth
         <div class="sidebar-footer">
             <div class="d-flex align-items-center mb-3">
                 <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle p-2 me-2">
@@ -207,19 +215,16 @@
                 </button>
             </form>
         </div>
-        @else
-        <div class="sidebar-footer">
-            <a href="{{ route('login') }}" class="btn btn-primary btn-sm w-100 mb-2">Connexion</a>
-            <a href="{{ route('register') }}" class="btn btn-outline-primary btn-sm w-100">Inscription</a>
-        </div>
-        @endauth
     </aside>
+    @endauth
 
     <div class="main-wrapper">
+        @auth
         <!-- Mobile Toggle -->
         <button class="btn btn-light d-lg-none mb-3 shadow-sm" id="sidebarToggle">
             <i class="bi bi-list"></i>
         </button>
+        @endauth
 
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 bg-success bg-opacity-10 text-success mb-4" role="alert">
@@ -236,11 +241,11 @@
         @endif
 
         @yield('contenu')
+        
+        <footer class="text-center py-5 text-muted small border-top mt-5">
+            &copy; {{ date('Y') }} - UPF Student Portal - v2.0
+        </footer>
     </div>
-
-    <footer class="text-center py-5 text-muted small">
-        &copy; {{ date('Y') }} - UPF Student Portal - v2.0
-    </footer>
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

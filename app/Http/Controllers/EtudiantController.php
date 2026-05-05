@@ -13,6 +13,16 @@ class EtudiantController extends Controller
      */
     public function index(Request $request)
     {
+        $user = auth()->user();
+
+        // Redirect students to their own profile
+        if ($user->isStudent()) {
+            if ($user->etudiant) {
+                return redirect()->route('etudiants.show', $user->etudiant->id);
+            }
+            return redirect()->route('home')->with('error', 'Profil étudiant non trouvé.');
+        }
+
         $query = Etudiant::with('filiere')->orderBy('nom');
 
         if ($request->filled('filiere')) {
@@ -86,7 +96,17 @@ class EtudiantController extends Controller
      */
     public function show(string $id)
     {
+        $user = auth()->user();
         $etudiant = Etudiant::with(['filiere', 'notes'])->findOrFail($id);
+
+        // Security check: Students can only see their own profile
+        if ($user->isStudent() && $etudiant->user_id !== $user->id) {
+            if ($user->etudiant) {
+                return redirect()->route('etudiants.show', $user->etudiant->id)
+                    ->with('error', 'Accès refusé : vous ne pouvez voir que votre propre profil.');
+            }
+            return redirect()->route('home')->with('error', 'Accès refusé.');
+        }
 
         return view('etudiants.show', compact('etudiant'));
     }
